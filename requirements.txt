@@ -1,0 +1,17 @@
+pinecone
+
+sentence-transformers
+
+unstructured[all-docs]
+
+semchunk
+
+groq
+
+python-dotenv
+
+pinecone_text
+
+sqlalchemy
+
+aiosqlite
