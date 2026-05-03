@@ -12,6 +12,8 @@ python-dotenv
 
 pinecone_text
 
-sqlalchemy
+tortoise-orm
 
-aiosqlite
+asyncpg
+   
+aerich
