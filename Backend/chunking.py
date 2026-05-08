@@ -2,7 +2,7 @@ from transformers import AutoTokenizer
 import semchunk
 import re
 
-MODEL_NAME = "nomic-ai/nomic-embed-text-v1.5"
+MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 CHUNK_SIZE = 512
 MIN_CHUNK_LENGTH = 50
 

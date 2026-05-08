@@ -8,7 +8,7 @@ import uuid
 load_dotenv()
 
 pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
-embedder = SentenceTransformer("nomic-ai/nomic-embed-text-v1.5", trust_remote_code=True)
+embedder = SentenceTransformer("all-MiniLM-L6-v2")
 pinecone_index_name = os.getenv("PINECONE_INDEX")
 index = pc.Index(pinecone_index_name)
 BATCH_SIZE = 100
