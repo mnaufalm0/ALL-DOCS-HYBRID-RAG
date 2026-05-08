@@ -4,7 +4,6 @@ from pinecone_text.sparse import BM25Encoder
 from groq import Groq
 from system_prompt import SYSTEM_PROMPT
 from dotenv import load_dotenv
-from db.models import UploadedFile
 import os
 load_dotenv()
 pinecone_api_key = os.getenv("PINECONE_API_KEY")
