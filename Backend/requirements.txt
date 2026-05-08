@@ -1,35 +1,46 @@
-fastapi==0.136.1
-uvicorn==0.46.0
-python-dotenv==1.2.2
-pydantic==2.13.3
-pydantic-settings==2.14.0
-python-multipart==0.0.26
-passlib==1.7.4
-cryptography==47.0.0
+# Server
+fastapi
+uvicorn[standard]
+
+# Database
+tortoise-orm
+asyncpg
+
+# Redis
+redis[asyncio]
+
+# Authentication
+passlib[bcrypt]
 python-jose[cryptography]
-fastapi-mail==1.6.4
-aiofiles==25.1.0
-asyncpg==0.31.0
-tortoise-orm==0.25.4
-aerich==0.9.2
-pinecone==8.1.2
-pinecone-text==0.11.0
-sentence-transformers==5.4.1
-transformers==5.6.2
-torch==2.11.0
-groq==1.2.0
-redis==7.4.0
-semchunk==4.0.0
-python-docx==1.2.0
-pypdf==6.10.2
-openpyxl==3.1.5
-python-pptx==1.0.2
-nltk==3.9.4
-numpy==2.4.4
-requests==2.33.1
-httpx==0.28.1
-email-validator==2.3.0
-huggingface_hub==1.11.0
-safetensors==0.7.0
-tokenizers==0.22.2
-tqdm==4.67.3
+pydantic[email]
+
+# HTTP Client (Google OAuth)
+httpx
+
+# Email
+fastapi-mail
+
+# Environment
+python-dotenv
+
+# Vector DB
+pinecone
+pinecone-text
+
+# Embeddings
+sentence-transformers
+einops
+tokenizers
+
+# Document Parsing
+unstructured[all-docs]
+
+# Chunking
+semchunk
+
+# LLM
+groq
+
+# Utilities
+python-multipart
+uuid
