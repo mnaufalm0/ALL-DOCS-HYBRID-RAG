@@ -6,17 +6,17 @@ import os
 import uuid
 
 load_dotenv()
+
 pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
-embedder = SentenceTransformer('nomic-ai/nomic-embed-text-v1', trust_remote_code=True)
-pinecone_index_name = os.getenv("PINECONE_INDEX_NAME")
+embedder = SentenceTransformer("nomic-ai/nomic-embed-text-v1.5", trust_remote_code=True)
+pinecone_index_name = os.getenv("PINECONE_INDEX")
 index = pc.Index(pinecone_index_name)
 BATCH_SIZE = 100
 
-bm25 = BM25Encoder()
+bm25 = BM25Encoder().default()
 
-def vectorize_in_batches(chunks, source_filename):
+def batch_insert(chunks, source_filename):
     
-    bm25.fit(chunks)
 
     total_stored = 0
     BATCH_SIZE = 100
