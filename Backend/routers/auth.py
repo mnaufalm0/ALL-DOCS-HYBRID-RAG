@@ -54,7 +54,7 @@ async def email_signup(body: EmailSignupRequest):
     await EmailAuth.create(
         id=uuid.uuid4(),
         user=user,
-        password_hash=pwd.hash(body.password)
+        password_hash=pwd.hash(body.password.encode("utf-8")[:72])
     )
 
     # Create verification token
@@ -83,7 +83,7 @@ async def email_login(body: EmailLoginRequest):
 
     # Check password
     email_auth = await EmailAuth.filter(user=user).first()
-    if not email_auth or not pwd.verify(body.password, email_auth.password_hash):
+    if not email_auth or not pwd.verify(body.password.encode("utf-8")[:72], email_auth.password_hash):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
     # Check verified
@@ -218,7 +218,7 @@ async def reset_confirm(body: PasswordResetConfirm):
         raise HTTPException(status_code=400, detail="This account uses Google login")
 
     await EmailAuth.filter(id=email_auth.id).update(
-        password_hash=pwd.hash(body.new_password)
+        password_hash=pwd.hash(body.new_password.encode("utf-8")[:72])
     )
     await delete_reset_token(body.token)
 

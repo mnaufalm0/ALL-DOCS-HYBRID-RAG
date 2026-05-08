@@ -194,10 +194,14 @@ def _parse_docx(filepath: str) -> list[Element]:
 
     for para in doc.paragraphs:
         text = para.text.strip()
+
         if not text or text in header_footer_texts:
             continue
-        is_heading = para.style.name.startswith('Heading')
-        elements.append(classify(text, is_heading=is_heading))
+
+    style_name = para.style.name if para.style else ""
+    is_heading = style_name.startswith("Heading")
+
+    elements.append(classify(text, is_heading=is_heading))
 
     for table in doc.tables:
         rows = []

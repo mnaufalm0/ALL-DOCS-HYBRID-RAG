@@ -13,7 +13,7 @@ bm25  = BM25Encoder().default()
 
 BATCH_SIZE = 100
 
-def batch_insert(chunks, source_filename, file_id):
+def batch_insert(chunks, source_filename, file_id, user_id):
     total_stored = 0
 
     for i in range(0, len(chunks), BATCH_SIZE):
@@ -33,12 +33,13 @@ def batch_insert(chunks, source_filename, file_id):
                 "metadata": {
                     "text": chunk,
                     "source": source_filename,
-                    "file_id": file_id, 
+                    "file_id": file_id,
+                    "user_id": user_id,
                     "chunk_index": i + j
                 }
             })
 
-        index.upsert(vectors=vectors)
+        index.upsert(vectors=vectors,namespace=str(user_id))
         total_stored += len(vectors)
         print(f"Inserted batch {i // BATCH_SIZE + 1} — Total: {total_stored}")
 

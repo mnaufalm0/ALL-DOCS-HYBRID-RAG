@@ -13,7 +13,6 @@ class QueryRequest(BaseModel):
     question: str
     top_k: int = 5
 
-
 @router.post("/")
 async def query(
     request: QueryRequest,
@@ -51,6 +50,7 @@ async def query(
     start = time.time()
     answer = query_rag(
         user_question=request.question,
+        user_id=user_id,                                          # ← fix: was missing
         top_k=request.top_k,
         system_prompt=active_prompt.prompt if active_prompt else None
     )

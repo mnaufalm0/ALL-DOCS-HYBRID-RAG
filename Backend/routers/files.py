@@ -47,7 +47,7 @@ async def upload(
 
     # Duplicate check
     file_hash = hashlib.md5(content).hexdigest()
-    existing  = await UploadedFile.filter(file_hash=file_hash, user_id=user_id).first()
+    existing  = await UploadedFile.filter(file_hash=file_hash, user_id=user_id, status="completed").first()
     if existing:
         raise HTTPException(status_code=400, detail="File already uploaded")
 
@@ -75,9 +75,20 @@ async def upload(
     try:
         # Pipeline
         elements = get_elements_fast(temp_path)
-        cleaned  = clean_elements(elements)
-        chunks   = chunk_text(cleaned)
-        batch_insert(chunks, source_filename=file.filename)
+        print("Extraction successful")
+
+        cleaned = clean_elements(elements)
+        print("Cleaning successful")
+
+        chunks = chunk_text(cleaned)
+        print("Chunking successful")
+
+        batch_insert(
+            chunks=chunks,
+            source_filename=file.filename,
+            file_id=file_id,
+            user_id=user_id
+        )
 
         # Update DB record
         await UploadedFile.filter(id=file_id).update(
@@ -87,10 +98,8 @@ async def upload(
         await set_upload_status(file_id, "completed")
 
     except Exception as e:
-        await UploadedFile.filter(id=file_id).update(
-            status="failed",
-            error_message=str(e)
-        )
+        print("PIPELINE ERROR:", repr(e))
+        await UploadedFile.filter(id=file_id).delete()
         await set_upload_status(file_id, "failed")
         raise HTTPException(status_code=500, detail=f"Processing failed: {str(e)}")
 
@@ -149,11 +158,13 @@ async def delete_file(
     if not file:
         raise HTTPException(status_code=404, detail="File not found")
 
-    index.delete(
-        filter={
-            "file_id": file_id
-        }
-    )
+    try:
+        index.delete(
+            filter={"file_id": file_id},
+            namespace=str(user["user_id"])
+        )
+    except Exception as e:
+        print("Pinecone delete error:", e)
 
     await file.delete()
 

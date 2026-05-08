@@ -27,7 +27,10 @@ def clean_elements(elements) -> list[str]:
         if type(element).__name__ in REMOVE_TYPES:
             continue
 
-        text = element.text or ""
+        if element is None:
+            continue
+
+        text = getattr(element, "text", "") or ""
 
         if len(text.split()) < MIN_WORD_COUNT:
             continue
