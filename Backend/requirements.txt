@@ -13,10 +13,10 @@ asyncpg
 redis[asyncio]
 
 # Authentication
+bcrypt==4.0.1
 passlib[bcrypt]
 python-jose[cryptography]
 pydantic[email]
-
 # HTTP Client
 httpx
 
