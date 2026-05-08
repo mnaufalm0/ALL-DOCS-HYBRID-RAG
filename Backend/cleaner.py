@@ -1,4 +1,4 @@
-from unstructured.partition.auto import partition
+from custom_partition import partition
 import re
 
 

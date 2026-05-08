@@ -14,7 +14,7 @@ passlib[bcrypt]
 python-jose[cryptography]
 pydantic[email]
 
-# HTTP Client (Google OAuth)
+# HTTP Client
 httpx
 
 # Email
@@ -33,7 +33,13 @@ einops
 tokenizers
 
 # Document Parsing
-unstructured[all-docs]
+pymupdf
+pytesseract
+Pillow
+python-docx
+python-pptx
+openpyxl
+beautifulsoup4
 
 # Chunking
 semchunk
@@ -43,4 +49,3 @@ groq
 
 # Utilities
 python-multipart
-uuid
