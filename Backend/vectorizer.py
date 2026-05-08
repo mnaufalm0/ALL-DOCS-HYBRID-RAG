@@ -9,13 +9,12 @@ load_dotenv()
 
 pc    = Pinecone(os.getenv("PINECONE_API_KEY"))
 index = pc.Index(os.getenv("PINECONE_INDEX"))
-bm25  = BM25Encoder()
+bm25  = BM25Encoder().default()  
 
 BATCH_SIZE = 100
 
-def batch_insert(chunks, source_filename):
+def batch_insert(chunks, source_filename, file_id):
     total_stored = 0
-    bm25.fit(chunks)
 
     for i in range(0, len(chunks), BATCH_SIZE):
         batch_chunks = chunks[i:i + BATCH_SIZE]
@@ -34,6 +33,7 @@ def batch_insert(chunks, source_filename):
                 "metadata": {
                     "text": chunk,
                     "source": source_filename,
+                    "file_id": file_id, 
                     "chunk_index": i + j
                 }
             })

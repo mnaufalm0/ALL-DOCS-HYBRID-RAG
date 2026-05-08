@@ -149,9 +149,6 @@ async def delete_file(
     if not file:
         raise HTTPException(status_code=404, detail="File not found")
 
-    if not file:
-        raise HTTPException(status_code=404, detail="File not found")
-
     index.delete(
         filter={
             "file_id": file_id

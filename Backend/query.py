@@ -11,7 +11,7 @@ load_dotenv()
 pc           = Pinecone(os.getenv("PINECONE_API_KEY"))
 index        = pc.Index(os.getenv("PINECONE_INDEX"))
 groq_client  = Groq(api_key=os.getenv("GROQ_API_KEY"))
-bm25         = BM25Encoder()
+bm25         = BM25Encoder().default()
 
 def query_rag(user_question: str, top_k: int = 5, system_prompt: str = None):
     # Step 1 — Embed query via API
@@ -37,7 +37,7 @@ def query_rag(user_question: str, top_k: int = 5, system_prompt: str = None):
 
     # Step 5 — Groq LLM
     response = groq_client.chat.completions.create(
-        model="llama3-8b-8192",
+        model="llama-3.3-70b-versatile",
         messages=[
             {"role": "system", "content": final_prompt},
             {"role": "user",   "content": user_question}
