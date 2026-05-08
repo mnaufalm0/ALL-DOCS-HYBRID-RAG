@@ -16,7 +16,10 @@ load_dotenv()
 pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
 index = pc.Index(os.getenv("PINECONE_INDEX"))
 UPLOAD_DIR        = "uploads/"
-ALLOWED_EXTENSIONS = [".pdf", ".docx", ".pptx", ".txt", ".csv", ".xlsx"]
+ALLOWED_EXTENSIONS = [
+    ".pdf", ".docx", ".doc", ".pptx", ".ppt",
+    ".txt", ".csv", ".xlsx", ".xls",
+    ".html", ".htm", ".md", ".rtf", ".epub"]
 MAX_FILE_SIZE     = 20 * 1024 * 1024  
 
 os.makedirs(UPLOAD_DIR, exist_ok=True)
@@ -30,6 +33,8 @@ async def upload(
     user_id = user["user_id"]
 
     # File type check
+    if not file or not file.filename:
+        raise HTTPException(status_code=400, detail="No file provided")
     ext = os.path.splitext(file.filename)[1].lower()
     if ext not in ALLOWED_EXTENSIONS:
         raise HTTPException(status_code=400, detail=f"Unsupported file type: {ext}")
