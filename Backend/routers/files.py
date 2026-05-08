@@ -19,7 +19,8 @@ UPLOAD_DIR        = "uploads/"
 ALLOWED_EXTENSIONS = [
     ".pdf", ".docx", ".doc", ".pptx", ".ppt",
     ".txt", ".csv", ".xlsx", ".xls",
-    ".html", ".htm", ".md", ".rtf", ".epub"]
+    ".html", ".htm", ".md", ".rtf", ".epub"
+]
 MAX_FILE_SIZE     = 20 * 1024 * 1024  
 
 os.makedirs(UPLOAD_DIR, exist_ok=True)
@@ -72,15 +73,15 @@ async def upload(
     await set_upload_status(file_id, "processing")
 
     try:
+        # Pipeline
         elements = get_elements_fast(temp_path)
         cleaned  = clean_elements(elements)
         chunks   = chunk_text(cleaned)
+        batch_insert(chunks, source_filename=file.filename)
 
-        vector_ids = batch_insert(chunks, source_filename=file.filename, file_id=file_id)
-
+        # Update DB record
         await UploadedFile.filter(id=file_id).update(
             chunks_stored=len(chunks),
-            vector_ids=vector_ids,
             status="completed"
         )
         await set_upload_status(file_id, "completed")
@@ -136,7 +137,10 @@ async def list_files(user=Depends(get_current_user)):
 
 
 @router.delete("/{file_id}")
-async def delete_file(file_id: str, user=Depends(get_current_user)):
+async def delete_file(
+    file_id: str,
+    user=Depends(get_current_user)
+):
     file = await UploadedFile.filter(
         id=file_id,
         user_id=user["user_id"]
@@ -145,14 +149,15 @@ async def delete_file(file_id: str, user=Depends(get_current_user)):
     if not file:
         raise HTTPException(status_code=404, detail="File not found")
 
-    # Delete by explicit IDs — works on free tier
-    if file.vector_ids:
-        try:
-            # Pinecone delete accepts max 1000 IDs per call
-            for i in range(0, len(file.vector_ids), 1000):
-                index.delete(ids=file.vector_ids[i:i + 1000])
-        except Exception as e:
-            print(f"[WARN] Pinecone delete failed: {e}")
+    if not file:
+        raise HTTPException(status_code=404, detail="File not found")
+
+    index.delete(
+        filter={
+            "file_id": file_id
+        }
+    )
 
     await file.delete()
+
     return {"message": f"✅ {file.original_name} deleted successfully"}

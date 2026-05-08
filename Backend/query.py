@@ -1,5 +1,6 @@
 from pinecone import Pinecone
 from pinecone_text.sparse import BM25Encoder
+from embedder import get_query_embedding
 from groq import Groq
 from system_prompt import SYSTEM_PROMPT
 from dotenv import load_dotenv
@@ -7,49 +8,40 @@ import os
 
 load_dotenv()
 
-pinecone_api_key = os.getenv("PINECONE_API_KEY")
-groq_api_key = os.getenv("GROQ_API_KEY")
-pinecone_index_name = os.getenv("PINECONE_INDEX")
-
-pc = Pinecone(api_key=pinecone_api_key)
-index = pc.Index(pinecone_index_name)
-groq_client = Groq(api_key=groq_api_key)
-
-_embedder = None
-_bm25 = None
-
-def get_embedder():
-    global _embedder
-    if _embedder is None:
-        from sentence_transformers import SentenceTransformer
-        _embedder = SentenceTransformer("all-MiniLM-L6-v2")
-    return _embedder
-
-def get_bm25():
-    global _bm25
-    if _bm25 is None:
-        _bm25 = BM25Encoder.default()
-    return _bm25
+pc           = Pinecone(os.getenv("PINECONE_API_KEY"))
+index        = pc.Index(os.getenv("PINECONE_INDEX"))
+groq_client  = Groq(api_key=os.getenv("GROQ_API_KEY"))
+bm25         = BM25Encoder()
 
 def query_rag(user_question: str, top_k: int = 5, system_prompt: str = None):
-    dense_embedding = get_embedder().encode([user_question]).tolist()[0]
-    sparse_embedding = get_bm25().encode_queries(user_question)
+    # Step 1 — Embed query via API
+    dense_embedding  = get_query_embedding(user_question)
+    sparse_embedding = bm25.encode_queries(user_question)
+
+    # Step 2 — Hybrid search
     results = index.query(
         vector=dense_embedding,
         sparse_vector=sparse_embedding,
         top_k=top_k,
         include_metadata=True
     )
+
+    # Step 3 — Build context
     context = "\n\n".join([
         f"Source: {match['metadata']['source']}\n{match['metadata']['text']}"
         for match in results["matches"]
     ])
-    final_prompt = SYSTEM_PROMPT.format(context=context)
+
+    # Step 4 — Use active prompt or default
+    final_prompt = (system_prompt or SYSTEM_PROMPT).format(context=context)
+
+    # Step 5 — Groq LLM
     response = groq_client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model="llama3-8b-8192",
         messages=[
             {"role": "system", "content": final_prompt},
-            {"role": "user", "content": user_question}
+            {"role": "user",   "content": user_question}
         ]
     )
+
     return response.choices[0].message.content

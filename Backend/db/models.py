@@ -89,7 +89,6 @@ class UploadedFile(Model):
     error_message = fields.TextField(null=True)
     uploaded_at   = fields.DatetimeField(auto_now_add=True)
     updated_at    = fields.DatetimeField(auto_now=True)
-    vector_ids = fields.JSONField(default=list)
 
     class Meta:
         table = "uploaded_files"
