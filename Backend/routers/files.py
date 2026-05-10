@@ -28,12 +28,12 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 @router.post("/upload")
 async def upload(
-    file: UploadFile = File(...),
+    file: UploadFile = File(),
     user=Depends(get_current_user)
 ):
     user_id = user["user_id"]
 
-    # File type check
+    
     if not file or not file.filename:
         raise HTTPException(status_code=400, detail="No file provided")
     ext = os.path.splitext(file.filename)[1].lower()

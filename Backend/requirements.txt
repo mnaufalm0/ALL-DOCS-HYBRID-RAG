@@ -29,6 +29,9 @@ python-dotenv
 pinecone
 pinecone-text
 
+#Reeanker
+cohere
+
 # Embeddings — API based, no local model
 nomic
 tiktoken

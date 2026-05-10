@@ -19,7 +19,7 @@ def batch_insert(chunks, source_filename, file_id, user_id):
     for i in range(0, len(chunks), BATCH_SIZE):
         batch_chunks = chunks[i:i + BATCH_SIZE]
 
-        dense_embeddings  = get_embeddings(batch_chunks)    # ✅ API call
+        dense_embeddings  = get_embeddings(batch_chunks)   
         sparse_embeddings = bm25.encode_documents(batch_chunks)
 
         vectors = []
