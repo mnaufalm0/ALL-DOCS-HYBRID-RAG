@@ -1,0 +1,128 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,300;1,9..144,400&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── CSS Variables ── */
+:root {
+  --bg:          #FAFAF7;
+  --bg-2:        #F5F4EF;
+  --bg-3:        #ECEAE0;
+  --border:      #D9D6C8;
+  --text:        #1E2530;
+  --text-2:      #4A5568;
+  --text-3:      #718096;
+  --accent:      #3D7EAA;
+  --accent-2:    #5B9BD5;
+  --accent-soft: #EBF3FA;
+  --sidebar-w:   280px;
+}
+
+.dark {
+  --bg:          #0F1319;
+  --bg-2:        #151B24;
+  --bg-3:        #1E2530;
+  --border:      #2D3748;
+  --text:        #F5F4EF;
+  --text-2:      #CBD5E0;
+  --text-3:      #718096;
+  --accent:      #5B9BD5;
+  --accent-2:    #8FB8D4;
+  --accent-soft: #1A2A3A;
+}
+
+/* ── Base ── */
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Grain Texture ── */
+.grain::after {
+  content: '';
+  position: fixed;
+  inset: -200%;
+  width: 400%;
+  height: 400%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  opacity: 0.025;
+  pointer-events: none;
+  z-index: 9999;
+  animation: grain 0.5s steps(1) infinite;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar       { width: 5px; }
+::-webkit-scrollbar-track { background: var(--bg-2); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+/* ── Selection ── */
+::selection {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+/* ── Utilities ── */
+.text-balance { text-wrap: balance; }
+
+.glass {
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+}
+
+.dark .glass {
+  background: rgba(15,19,25,0.6);
+}
+
+/* ── Sidebar transition ── */
+.sidebar-transition {
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Processing animation rings ── */
+@keyframes ring-pulse {
+  0%   { transform: scale(0.8); opacity: 0.8; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+.ring-pulse {
+  animation: ring-pulse 2.5s ease-out infinite;
+}
+
+.ring-pulse-2 { animation-delay: 0.8s; }
+.ring-pulse-3 { animation-delay: 1.6s; }
+
+/* ── Processing particle ── */
+@keyframes particle-float {
+  0%   { transform: translateY(0) scale(1);   opacity: 1; }
+  100% { transform: translateY(-80px) scale(0); opacity: 0; }
+}
+
+.particle {
+  animation: particle-float 2s ease-out infinite;
+}
+
+/* ── Chat message slide ── */
+@keyframes msg-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.msg-in { animation: msg-in 0.3s ease forwards; }
