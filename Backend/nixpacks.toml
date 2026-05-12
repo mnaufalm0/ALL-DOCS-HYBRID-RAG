@@ -1,11 +1,10 @@
 [phases.setup]
-nixPkgs = ["tesseract", "libtesseract"]
+nixPkgs = ["tesseract"]
 
 [phases.build]
 cmds = [
-  "python -m venv /opt/venv && . /opt/venv/bin/activate && pip install -r requirements.txt",
-  "python -c \"import nltk; nltk.download('punkt', quiet=True); nltk.download('punkt_tab', quiet=True); nltk.download('stopwords', quiet=True)\""
+  "python -m venv /opt/venv && . /opt/venv/bin/activate && pip install -r requirements.txt"
 ]
 
 [start]
-cmd = "uvicorn main:app --host 0.0.0.0 --port ${PORT}"
+cmd = "uvicorn main:app --host 0.0.0.0 --port $PORT"
