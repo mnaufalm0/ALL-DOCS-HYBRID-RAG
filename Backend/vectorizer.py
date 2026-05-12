@@ -6,20 +6,21 @@ import uuid
 import os
 
 load_dotenv()
-
-pc    = Pinecone(os.getenv("PINECONE_API_KEY"))
-index = pc.Index(os.getenv("PINECONE_INDEX"))
+pinecone_api_key = os.getenv("PINECONE_API_KEY")
+pinecone_index = os.getenv("PINECONE_INDEX")
+pc    = Pinecone(pinecone_api_key)
+index = pc.Index(pinecone_index)
 bm25  = BM25Encoder().default()  
 
 BATCH_SIZE = 100
 
-def batch_insert(chunks, source_filename, file_id, user_id):
+async def batch_insert(chunks, source_filename, file_id, user_id):
     total_stored = 0
 
     for i in range(0, len(chunks), BATCH_SIZE):
         batch_chunks = chunks[i:i + BATCH_SIZE]
 
-        dense_embeddings  = get_embeddings(batch_chunks)   
+        dense_embeddings  = await get_embeddings(batch_chunks)   
         sparse_embeddings = bm25.encode_documents(batch_chunks)
 
         vectors = []

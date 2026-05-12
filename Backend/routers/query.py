@@ -11,7 +11,8 @@ router = APIRouter()
 
 class QueryRequest(BaseModel):
     question: str
-    top_k: int = 5
+    top_k: int = 10
+    top_n: int = 3
 
 @router.post("/")
 async def query(
@@ -48,12 +49,15 @@ async def query(
 
     # Run RAG
     start = time.time()
-    answer = query_rag(
-        user_question=request.question,
-        user_id=user_id,                                          # ← fix: was missing
-        top_k=request.top_k,
-        system_prompt=active_prompt.prompt if active_prompt else None
-    )
+    try:
+        answer = await query_rag(
+            user_question=request.question,
+            user_id=user_id,                                         
+            top_k=request.top_k,
+            system_prompt=active_prompt.prompt if active_prompt else None
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error occurred while querying RAG: {str(e)}")
     response_time = time.time() - start
 
     # Cache answer

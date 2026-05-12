@@ -5,24 +5,37 @@ from groq import Groq
 from system_prompt import SYSTEM_PROMPT
 from reranker import rerank
 from dotenv import load_dotenv
+from typing import Optional, Dict, Any
 import os
 
 load_dotenv()
 
-pc          = Pinecone(os.getenv("PINECONE_API_KEY"))
-index       = pc.Index(os.getenv("PINECONE_INDEX"))
-groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+pinecone_api_key = os.getenv("PINECONE_API_KEY")
+pinecone_index = os.getenv("PINECONE_INDEX")
+groq_api_key = os.getenv("GROQ_API_KEY")
+
+if pinecone_api_key is None:
+    raise ValueError("PINECONE_API_KEY environment variable is not set")
+if pinecone_index is None:
+    raise ValueError("PINECONE_INDEX environment variable is not set")
+if groq_api_key is None:
+    raise ValueError("GROQ_API_KEY environment variable is not set")
+
+pc          = Pinecone(pinecone_api_key)
+index       = pc.Index(pinecone_index)
+groq_client = Groq(api_key=groq_api_key)
+
 bm25        = BM25Encoder().default()
 
-def query_rag(
+async def query_rag(
     user_question: str,
     user_id: str,
     top_k: int = 10,        
     top_n: int = 3,         
-    system_prompt: str = None
+    system_prompt: Optional[str] = None
 ):
 
-    dense_embedding  = get_query_embedding(user_question)
+    dense_embedding  = await get_query_embedding(user_question)
     sparse_embedding = bm25.encode_queries(user_question)
 
     

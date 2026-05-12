@@ -13,8 +13,15 @@ from dotenv import load_dotenv
 from pinecone import Pinecone
 router = APIRouter()
 load_dotenv()
+pinecone_index = os.getenv("PINECONE_INDEX")
+if not pinecone_index:
+    raise RuntimeError("PINECONE_INDEX environment variable is required")
 pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
-index = pc.Index(os.getenv("PINECONE_INDEX"))
+try:
+    index = pc.Index(pinecone_index)
+except Exception as e:
+    print(f"Error occurred while initializing Pinecone index: {str(e)}")
+    index = None
 UPLOAD_DIR        = "uploads/"
 ALLOWED_EXTENSIONS = [
     ".pdf", ".docx", ".doc", ".pptx", ".ppt",
@@ -83,7 +90,7 @@ async def upload(
         chunks = chunk_text(cleaned)
         print("Chunking successful")
 
-        batch_insert(
+        await batch_insert(
             chunks=chunks,
             source_filename=file.filename,
             file_id=file_id,

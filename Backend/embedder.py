@@ -1,31 +1,40 @@
-import nomic
-from nomic import embed
-from dotenv import load_dotenv
+import httpx
 import os
-
+from dotenv import load_dotenv
 load_dotenv()
 
-nomic.login(os.getenv("NOMIC_API_KEY"))
+NOMIC_API_KEY = os.getenv("NOMIC_API_KEY")
 
-def get_embeddings(texts: list[str]) -> list[list[float]]:
-    """
-    texts — list of strings
-    returns — list of embedding vectors
-    """
-    response = embed.text(
-        texts=texts,
-        model="nomic-embed-text-v1.5",
-        task_type="search_document"    # for storing docs
-    )
-    return response["embeddings"]
+async def get_embeddings(texts: list[str]) -> list[list[float]]:
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            "https://api-atlas.nomic.ai/v1/embedding/text",
+            headers={
+                "Authorization": f"Bearer {NOMIC_API_KEY}",
+                "Content-Type": "application/json"
+            },
+            json={
+                "texts": texts,
+                "model": "nomic-embed-text-v1.5",
+                "task_type": "search_document"
+            },
+            timeout=30
+        )
+        return response.json()["embeddings"]
 
-def get_query_embedding(query: str) -> list[float]:
-    """
-    Single query embedding — different task_type for better retrieval
-    """
-    response = embed.text(
-        texts=[query],
-        model="nomic-embed-text-v1.5",
-        task_type="search_query"
-    )
-    return response["embeddings"][0]
+async def get_query_embedding(query: str) -> list[float]:
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            "https://api-atlas.nomic.ai/v1/embedding/text",
+            headers={
+                "Authorization": f"Bearer {NOMIC_API_KEY}",
+                "Content-Type": "application/json"
+            },
+            json={
+                "texts": [query],
+                "model": "nomic-embed-text-v1.5",
+                "task_type": "search_query"
+            },
+            timeout=30
+        )
+        return response.json()["embeddings"][0]

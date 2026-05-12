@@ -33,7 +33,6 @@ pinecone-text
 cohere
 
 # Embeddings — API based, no local model
-nomic
 tiktoken
 
 # Document Parsing
